@@ -1,1 +1,1 @@
-# homebrew tap for squid with --enable-internal-dns
+# homebrew tap for squid3.5
