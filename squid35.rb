@@ -288,8 +288,9 @@ __END__
  static int
  ldap_simple_rebind(
 -    LDAP * ld,
+-    LDAP_CONST char *url,
 +    LDAP *ld,
-     LDAP_CONST char *,
++    LDAP_CONST char *,
      ber_tag_t request,
      ber_int_t msgid,
      void *params)
