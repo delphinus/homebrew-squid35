@@ -286,9 +286,6 @@ __END__
      ber_tag_t request,
      ber_int_t msgid,
      void *params)
- {
-     struct ldap_creds *cp = (struct ldap_creds *) params;
-     return tool_sasl_bind(ld, cp->dn, cp->pw);
 @@ -212,11 +227,16 @@
  static LDAP_REBIND_PROC ldap_simple_rebind;
  
