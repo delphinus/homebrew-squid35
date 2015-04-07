@@ -274,7 +274,7 @@ __END__
  }
  #else
  #error "No rebind functione defined"
-@@ -202,7 +217,7 @@
+@@ -202,9 +217,9 @@
  static LDAP_REBIND_PROC ldap_sasl_rebind;
  
  static int
