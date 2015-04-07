@@ -7,7 +7,7 @@ class Squid35 < Formula
 
   depends_on "openssl"
 
-  patch :DATA
+  patch :p0, :DATA
 
   def install
     # http://stackoverflow.com/questions/20910109/building-squid-cache-on-os-x-mavericks
