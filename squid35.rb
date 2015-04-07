@@ -140,8 +140,7 @@ __END__
  ##
  
 -AC_INIT([Squid Web Proxy],[3.HEAD-BZR],[http://bugs.squid-cache.org/],[squid])
-+AC_INIT([Squid Web Proxy],[3.HEAD-20150228-r13957],[http://bugs.squid-cache.org/],[sq \
-uid])  AC_PREREQ(2.61)
++AC_INIT([Squid Web Proxy],[3.HEAD-20150228-r13957],[http://bugs.squid-cache.org/],[squid])  AC_PREREQ(2.61)
  AC_CONFIG_HEADERS([include/autoconf.h])
  AC_CONFIG_AUX_DIR(cfgaux)
 @@ -1399,6 +1399,7 @@
@@ -154,11 +153,10 @@ uid])  AC_PREREQ(2.61)
  
 @@ -1489,6 +1490,7 @@
        krb5confpath="`dirname $ac_cv_path_krb5_config`"
-       ac_heimdal="`$ac_cv_path_krb5_config --version 2>/dev/null | grep -c -i \
-                heimdal`"
-       ac_solaris="`$ac_cv_path_krb5_config --version 2>/dev/null | grep -c -i \
-solaris`" +      ac_apple="`$ac_cv_path_krb5_config --vendor 2>/dev/null | grep -c -i \
-apple`"  if test $ac_heimdal -gt 0 ; then
+       ac_heimdal="`$ac_cv_path_krb5_config --version 2>/dev/null | grep -c -i heimdal`"
+       ac_solaris="`$ac_cv_path_krb5_config --version 2>/dev/null | grep -c -i solaris`"
++      ac_apple="`$ac_cv_path_krb5_config --vendor 2>/dev/null | grep -c -i apple`"
+       if test $ac_heimdal -gt 0 ; then
  	with_heimdal_krb5=yes
          ac_with_krb5_count=1
 @@ -1497,7 +1499,11 @@
@@ -170,8 +168,7 @@ apple`"  if test $ac_heimdal -gt 0 ; then
 +	with_apple_krb5=yes
 +        ac_with_krb5_count=1
 +      fi
-+      if test $ac_heimdal -eq 0 && test $ac_solaris -eq 0 && test $ac_apple -eq 0; \
-then  with_mit_krb5=yes
++      if test $ac_heimdal -eq 0 && test $ac_solaris -eq 0 && test $ac_apple -eq 0; then  with_mit_krb5=yes
          ac_with_krb5_count=1
        fi
 @@ -1507,7 +1513,7 @@
@@ -233,10 +230,8 @@ then  with_mit_krb5=yes
  #warn "Warning! You have a broken Solaris <krb5.h> system header"
 
 === modified file 'helpers/external_acl/kerberos_ldap_group/support_ldap.cc'
---- helpers/external_acl/kerberos_ldap_group/support_ldap.cc	2015-01-13 07:25:36 \
-                +0000
-+++ helpers/external_acl/kerberos_ldap_group/support_ldap.cc	2015-03-05 21:52:26 \
-+0000 @@ -114,11 +114,16 @@
+--- helpers/external_acl/kerberos_ldap_group/support_ldap.cc	2015-01-13 07:25:36 +0000
++++ helpers/external_acl/kerberos_ldap_group/support_ldap.cc	2015-03-05 21:52:26 +0000 @@ -114,11 +114,16 @@
      void *params)
  {
      struct ldap_creds *cp = (struct ldap_creds *) params;
@@ -291,8 +286,7 @@ then  with_mit_krb5=yes
  
  static int
 -ldap_sasl_rebind(LDAP *ld, LDAP_CONST char *, ber_tag_t, ber_int_t, void *params)
-+ldap_sasl_rebind(LDAP *ld, LDAP_CONST char *, ber_tag_t request, ber_int_t msgid, \
-void *params)  {
++ldap_sasl_rebind(LDAP *ld, LDAP_CONST char *, ber_tag_t request, ber_int_t msgid, void *params)  {
      struct ldap_creds *cp = (struct ldap_creds *) params;
      return tool_sasl_bind(ld, cp->dn, cp->pw);
 @@ -212,11 +227,16 @@
@@ -300,8 +294,7 @@ void *params)  {
  
  static int
 -ldap_simple_rebind(LDAP * ld, LDAP_CONST char *, ber_tag_t, ber_int_t, void *params)
-+ldap_simple_rebind(LDAP *ld, LDAP_CONST char *, ber_tag_t request, ber_int_t msgid, \
-void *params)  {
++ldap_simple_rebind(LDAP *ld, LDAP_CONST char *, ber_tag_t request, ber_int_t msgid, void *params)  {
  
      struct ldap_creds *cp = (struct ldap_creds *) params;
 -    return ldap_bind_s(ld, cp->dn, cp->pw, LDAP_AUTH_SIMPLE);
@@ -317,8 +310,7 @@ void *params)  {
 @@ -745,7 +765,7 @@
      xfree(ldapuri);
      if (rc != LDAP_SUCCESS) {
-         error((char *) "%s| %s: ERROR: Error while initialising connection to ldap \
-                server: %s\n", LogTime(), PROGRAM, ldap_err2string(rc));
+         error((char *) "%s| %s: ERROR: Error while initialising connection to ldap server: %s\n", LogTime(), PROGRAM, ldap_err2string(rc));
 -        ldap_unbind(ld);
 +        ldap_unbind_ext(ld,NULL,NULL);
          ld = NULL;
@@ -327,8 +319,7 @@ void *params)  {
 @@ -755,7 +775,7 @@
      rc = ldap_set_defaults(ld);
      if (rc != LDAP_SUCCESS) {
-         error((char *) "%s| %s: ERROR: Error while setting default options for ldap \
-                server: %s\n", LogTime(), PROGRAM, ldap_err2string(rc));
+         error((char *) "%s| %s: ERROR: Error while setting default options for ldap server: %s\n", LogTime(), PROGRAM, ldap_err2string(rc));
 -        ldap_unbind(ld);
 +        ldap_unbind_ext(ld, NULL, NULL);
          ld = NULL;
@@ -337,8 +328,7 @@ void *params)  {
 @@ -767,7 +787,7 @@
          rc = ldap_set_ssl_defaults(margs);
          if (rc != LDAP_SUCCESS) {
-             error((char *) "%s| %s: ERROR: Error while setting SSL default options \
-                for ldap server: %s\n", LogTime(), PROGRAM, ldap_err2string(rc));
+             error((char *) "%s| %s: ERROR: Error while setting SSL default options for ldap server: %s\n", LogTime(), PROGRAM, ldap_err2string(rc));
 -            ldap_unbind(ld);
 +            ldap_unbind_ext(ld, NULL, NULL);
              ld = NULL;
@@ -347,8 +337,7 @@ void *params)  {
 @@ -778,7 +798,7 @@
          rc = ldap_start_tls_s(ld, NULL, NULL);
          if (rc != LDAP_SUCCESS) {
-             error((char *) "%s| %s: ERROR: Error while setting start_tls for ldap \
-                server: %s\n", LogTime(), PROGRAM, ldap_err2string(rc));
+             error((char *) "%s| %s: ERROR: Error while setting start_tls for ldap server: %s\n", LogTime(), PROGRAM, ldap_err2string(rc));
 -            ldap_unbind(ld);
 +            ldap_unbind_ext(ld, NULL, NULL);
              ld = NULL;
@@ -357,8 +346,7 @@ void *params)  {
 @@ -810,14 +830,14 @@
              xfree(ldapuri);
              if (rc != LDAP_SUCCESS) {
-                 error((char *) "%s| %s: ERROR: Error while initialising connection \
-                to ldap server: %s\n", LogTime(), PROGRAM, ldap_err2string(rc));
+                 error((char *) "%s| %s: ERROR: Error while initialising connection to ldap server: %s\n", LogTime(), PROGRAM, ldap_err2string(rc));
 -                ldap_unbind(ld);
 +                ldap_unbind_ext(ld, NULL, NULL);
                  ld = NULL;
@@ -366,8 +354,7 @@ void *params)  {
              }
              rc = ldap_set_defaults(ld);
              if (rc != LDAP_SUCCESS) {
-                 error((char *) "%s| %s: ERROR: Error while setting default options \
-                for ldap server: %s\n", LogTime(), PROGRAM, ldap_err2string(rc));
+                 error((char *) "%s| %s: ERROR: Error while setting default options for ldap server: %s\n", LogTime(), PROGRAM, ldap_err2string(rc));
 -                ldap_unbind(ld);
 +                ldap_unbind_ext(ld, NULL, NULL);
                  ld = NULL;
@@ -376,8 +363,7 @@ void *params)  {
 @@ -826,14 +846,14 @@
          ld = ldapssl_init(host, port, 1);
          if (!ld) {
-             error((char *) "%s| %s: ERROR: Error while setting SSL for ldap server: \
-                %s\n", LogTime(), PROGRAM, ldapssl_err2string(rc));
+             error((char *) "%s| %s: ERROR: Error while setting SSL for ldap server: %s\n", LogTime(), PROGRAM, ldapssl_err2string(rc));
 -            ldap_unbind(ld);
 +            ldap_unbind_ext(ld, NULL, NULL);
              ld = NULL;
@@ -385,8 +371,7 @@ void *params)  {
          }
          rc = ldap_set_defaults(ld);
          if (rc != LDAP_SUCCESS) {
-             error((char *) "%s| %s: ERROR: Error while setting default options for \
-                ldap server: %s\n", LogTime(), PROGRAM, ldap_err2string(rc));
+             error((char *) "%s| %s: ERROR: Error while setting default options for ldap server: %s\n", LogTime(), PROGRAM, ldap_err2string(rc));
 -            ldap_unbind(ld);
 +            ldap_unbind_ext(ld, NULL, NULL);
              ld = NULL;
@@ -395,8 +380,7 @@ void *params)  {
 @@ -940,7 +960,7 @@
              rc = tool_sasl_bind(ld, bindp, margs->ssl);
              if (rc != LDAP_SUCCESS) {
-                 error((char *) "%s| %s: ERROR: Error while binding to ldap server \
-                with SASL/GSSAPI: %s\n", LogTime(), PROGRAM, ldap_err2string(rc));
+                 error((char *) "%s| %s: ERROR: Error while binding to ldap server with SASL/GSSAPI: %s\n", LogTime(), PROGRAM, ldap_err2string(rc));
 -                ldap_unbind(ld);
 +                ldap_unbind_ext(ld, NULL, NULL);
                  ld = NULL;
@@ -409,8 +393,7 @@ void *params)  {
 -            ldap_unbind(ld);
 +            ldap_unbind_ext(ld, NULL, NULL);
              ld = NULL;
-             error((char *) "%s| %s: ERROR: SASL not supported on system\n", \
-LogTime(), PROGRAM);  continue;
+             error((char *) "%s| %s: ERROR: SASL not supported on system\n", LogTime(), PROGRAM);  continue;
 @@ -993,7 +1013,11 @@
          nhosts = get_hostname_list(&hlist, 0, host);
          xfree(host);
@@ -430,11 +413,9 @@ LogTime(), PROGRAM);  continue;
              debug((char *) "%s| %s: DEBUG: Bind to ldap server with \
                 Username/Password\n", LogTime(), PROGRAM);
 -            rc = ldap_simple_bind_s(ld, margs->luser, margs->lpass);
-+	    rc = ldap_sasl_bind_s(ld, margs->luser, LDAP_SASL_SIMPLE, &cred, NULL, NULL, \
-NULL);  if (rc != LDAP_SUCCESS) {
-                 error((char *) "%s| %s: ERROR: Error while binding to ldap server \
-                with Username/Password: %s\n", LogTime(), PROGRAM, \
-                ldap_err2string(rc));
++	    rc = ldap_sasl_bind_s(ld, margs->luser, LDAP_SASL_SIMPLE, &cred, NULL, NULL, NULL);
+             if (rc != LDAP_SUCCESS) {
+                 error((char *) "%s| %s: ERROR: Error while binding to ldap server with Username/Password: %s\n", LogTime(), PROGRAM, ldap_err2string(rc));
 -                ldap_unbind(ld);
 +                ldap_unbind_ext(ld, NULL, NULL);
                  ld = NULL;
@@ -443,8 +424,7 @@ NULL);  if (rc != LDAP_SUCCESS) {
 @@ -1040,7 +1064,7 @@
      rc = check_AD(margs, ld);
      if (rc != LDAP_SUCCESS) {
-         error((char *) "%s| %s: ERROR: Error determining ldap server type: %s\n", \
-                LogTime(), PROGRAM, ldap_err2string(rc));
+         error((char *) "%s| %s: ERROR: Error determining ldap server type: %s\n", LogTime(), PROGRAM, ldap_err2string(rc));
 -        ldap_unbind(ld);
 +        ldap_unbind_ext(ld, NULL, NULL);
          ld = NULL;
@@ -453,8 +433,7 @@ NULL);  if (rc != LDAP_SUCCESS) {
 @@ -1066,7 +1090,7 @@
  
      if (rc != LDAP_SUCCESS) {
-         error((char *) "%s| %s: ERROR: Error searching ldap server: %s\n", \
-                LogTime(), PROGRAM, ldap_err2string(rc));
+         error((char *) "%s| %s: ERROR: Error searching ldap server: %s\n", LogTime(), PROGRAM, ldap_err2string(rc));
 -        ldap_unbind(ld);
 +        ldap_unbind_ext(ld, NULL, NULL);
          ld = NULL;
@@ -477,8 +456,7 @@ NULL);  if (rc != LDAP_SUCCESS) {
 +    rc = ldap_unbind_ext(ld, NULL, NULL);
      ld = NULL;
      if (rc != LDAP_SUCCESS) {
-         error((char *) "%s| %s: ERROR: Error unbind ldap server: %s\n", LogTime(), \
-PROGRAM, ldap_err2string(rc));
+         error((char *) "%s| %s: ERROR: Error unbind ldap server: %s\n", LogTime(), PROGRAM, ldap_err2string(rc));
 
 === modified file 'helpers/negotiate_auth/kerberos/negotiate_kerberos.h'
 --- helpers/negotiate_auth/kerberos/negotiate_kerberos.h	2015-01-13 07:25:36 +0000
@@ -511,10 +489,8 @@ PROGRAM, ldap_err2string(rc));
 +int check_k5_err(krb5_context context, const char *msg, krb5_error_code code);
 
 === modified file 'helpers/negotiate_auth/kerberos/negotiate_kerberos_auth.cc'
---- helpers/negotiate_auth/kerberos/negotiate_kerberos_auth.cc	2015-02-06 10:04:11 \
-                +0000
-+++ helpers/negotiate_auth/kerberos/negotiate_kerberos_auth.cc	2015-03-05 21:52:26 \
-+0000 @@ -65,7 +65,6 @@
+--- helpers/negotiate_auth/kerberos/negotiate_kerberos_auth.cc	2015-02-06 10:04:11 +0000
++++ helpers/negotiate_auth/kerberos/negotiate_kerberos_auth.cc	2015-03-05 21:52:26 +0000 @@ -65,7 +65,6 @@
                                   krb5_kt_list *kt_list);
  #endif /* HAVE_KRB5_MEMORY_KEYTAB */
  
@@ -532,10 +508,8 @@ PROGRAM, ldap_err2string(rc));
  gethost_name(void)
 
 === modified file 'helpers/negotiate_auth/kerberos/negotiate_kerberos_auth_test.cc'
---- helpers/negotiate_auth/kerberos/negotiate_kerberos_auth_test.cc	2015-01-13 \
-                07:25:36 +0000
-+++ helpers/negotiate_auth/kerberos/negotiate_kerberos_auth_test.cc	2015-03-05 \
-21:52:26 +0000 @@ -33,6 +33,9 @@
+--- helpers/negotiate_auth/kerberos/negotiate_kerberos_auth_test.cc	2015-01-13 07:25:36 +0000
++++ helpers/negotiate_auth/kerberos/negotiate_kerberos_auth_test.cc	2015-03-05 21:52:26 +0000 @@ -33,6 +33,9 @@
  #include "squid.h"
  
  #if HAVE_GSSAPI
