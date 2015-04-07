@@ -286,9 +286,10 @@ __END__
  static LDAP_REBIND_PROC ldap_simple_rebind;
  
  static int
- ldap_simple_rebind(
+-ldap_sasl_rebind(
 -    LDAP * ld,
 -    LDAP_CONST char *url,
++ldap_simple_rebind(
 +    LDAP *ld,
 +    LDAP_CONST char *,
      ber_tag_t request,
