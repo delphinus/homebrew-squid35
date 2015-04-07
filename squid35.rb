@@ -20,6 +20,7 @@ class Squid35 < Formula
       --localstatedir=#{var}
       --enable-ssl
       --enable-ssl-crtd
+      --with-openssl
       --disable-eui
       --enable-pf-transparent
       --with-included-ltdl
