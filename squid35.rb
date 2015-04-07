@@ -140,7 +140,8 @@ __END__
  ##
  
 -AC_INIT([Squid Web Proxy],[3.HEAD-BZR],[http://bugs.squid-cache.org/],[squid])
-+AC_INIT([Squid Web Proxy],[3.HEAD-20150228-r13957],[http://bugs.squid-cache.org/],[squid])  AC_PREREQ(2.61)
++AC_INIT([Squid Web Proxy],[3.HEAD-20150228-r13957],[http://bugs.squid-cache.org/],[squid])
+ AC_PREREQ(2.61)
  AC_CONFIG_HEADERS([include/autoconf.h])
  AC_CONFIG_AUX_DIR(cfgaux)
 @@ -1399,6 +1399,7 @@
