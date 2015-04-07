@@ -286,7 +286,7 @@ __END__
      ber_tag_t request,
      ber_int_t msgid,
      void *params)
-@@ -212,11 +227,16 @@
+@@ -212,16 +227,21 @@
  static LDAP_REBIND_PROC ldap_simple_rebind;
  
  static int
