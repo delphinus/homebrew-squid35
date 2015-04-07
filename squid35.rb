@@ -135,15 +135,6 @@ __END__
 === modified file 'configure.ac'
 --- configure.ac	2015-02-26 10:25:12 +0000
 +++ configure.ac	2015-03-06 21:36:23 +0000
-@@ -5,7 +5,7 @@
- ## Please see the COPYING and CONTRIBUTORS files for details.
- ##
- 
--AC_INIT([Squid Web Proxy],[3.HEAD-BZR],[http://bugs.squid-cache.org/],[squid])
-+AC_INIT([Squid Web Proxy],[3.HEAD-20150228-r13957],[http://bugs.squid-cache.org/],[squid])
- AC_PREREQ(2.61)
- AC_CONFIG_HEADERS([include/autoconf.h])
- AC_CONFIG_AUX_DIR(cfgaux)
 @@ -1399,6 +1399,7 @@
      with_mit_krb5=yes
  esac
@@ -169,7 +160,8 @@ __END__
 +	with_apple_krb5=yes
 +        ac_with_krb5_count=1
 +      fi
-+      if test $ac_heimdal -eq 0 && test $ac_solaris -eq 0 && test $ac_apple -eq 0; then  with_mit_krb5=yes
++      if test $ac_heimdal -eq 0 && test $ac_solaris -eq 0 && test $ac_apple -eq 0; then
+         with_mit_krb5=yes
          ac_with_krb5_count=1
        fi
 @@ -1507,7 +1513,7 @@
