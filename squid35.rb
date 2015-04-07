@@ -397,7 +397,8 @@ __END__
 -            ldap_unbind(ld);
 +            ldap_unbind_ext(ld, NULL, NULL);
              ld = NULL;
-             error((char *) "%s| %s: ERROR: SASL not supported on system\n", LogTime(), PROGRAM);  continue;
+             error((char *) "%s| %s: ERROR: SASL not supported on system\n", LogTime(), PROGRAM);
+             continue;
 @@ -993,7 +1013,11 @@
          nhosts = get_hostname_list(&hlist, 0, host);
          xfree(host);
