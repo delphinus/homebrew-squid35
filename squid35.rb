@@ -286,7 +286,7 @@ __END__
      ber_tag_t request,
      ber_int_t msgid,
      void *params)
-@@ -212,16 +227,21 @@
+@@ -212,9 +227,9 @@
  static LDAP_REBIND_PROC ldap_simple_rebind;
  
  static int
@@ -298,6 +298,7 @@ __END__
      ber_tag_t request,
      ber_int_t msgid,
      void *params)
+@@ -231,7 +246,12 @@
  {
  
      struct ldap_creds *cp = (struct ldap_creds *) params;
