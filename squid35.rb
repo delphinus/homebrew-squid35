@@ -415,8 +415,7 @@ __END__
 @@ -1002,10 +1026,10 @@
               */
  
-             debug((char *) "%s| %s: DEBUG: Bind to ldap server with \
-                Username/Password\n", LogTime(), PROGRAM);
+             debug((char *) "%s| %s: DEBUG: Bind to ldap server with Username/Password\n", LogTime(), PROGRAM);
 -            rc = ldap_simple_bind_s(ld, margs->luser, margs->lpass);
 +	    rc = ldap_sasl_bind_s(ld, margs->luser, LDAP_SASL_SIMPLE, &cred, NULL, NULL, NULL);
              if (rc != LDAP_SUCCESS) {
