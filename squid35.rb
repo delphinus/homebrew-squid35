@@ -161,7 +161,7 @@ __END__
 +        ac_with_krb5_count=1
 +      fi
 +      if test $ac_heimdal -eq 0 && test $ac_solaris -eq 0 && test $ac_apple -eq 0; then
-         with_mit_krb5=yes
+ 	with_mit_krb5=yes
          ac_with_krb5_count=1
        fi
 @@ -1507,7 +1513,7 @@
